@@ -1,3 +1,4 @@
+import { CacheProvider, EmotionCache } from "@emotion/react";
 import { authExchange } from "@urql/exchange-auth";
 import { withUrqlClient } from "next-urql";
 import App, { AppProps } from "next/app";
@@ -12,9 +13,33 @@ import {
   makeOperation,
   Operation,
 } from "urql";
+import Head from "next/head";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { createEmotionCache } from "../lib/front/cache";
+import { theme } from "../lib/front/theme";
+import { Copyright } from "../lib/components/copyright";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+const clientSideEmotionCache = createEmotionCache();
+
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache;
+}
+
+function MyApp(props: MyAppProps) {
+  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+  let X = Component as any;
+  return (
+    <CacheProvider value={emotionCache}>
+      <Head>
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+      </Head>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <X {...pageProps} />
+        <Copyright />
+      </ThemeProvider>
+    </CacheProvider>
+  );
 }
 
 const logout = () => localStorage.clear();
@@ -108,7 +133,7 @@ const willAuthError = ({
 };
 
 export default withUrqlClient((ssrExchange) => ({
-  url: "http://localhost:3000/graphql",
+  url: "http://localhost:3000/api/graphql",
   exchanges: [
     dedupExchange,
     cacheExchange,
