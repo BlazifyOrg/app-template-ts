@@ -19,7 +19,7 @@ export const Auth: MiddlewareFn<Context> = async ({ context }, next) => {
     if (!user) throw new GraphQLError("user", "No user found");
     if (user.jwt_version !== v)
       throw new GraphQLError("user", "Not authenticate");
-    if (type === "bearer" && !bot) {
+    if (type.toLowerCase() === "bearer" && !bot) {
       context.userId = id;
       return next();
     } else {

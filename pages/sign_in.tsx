@@ -14,6 +14,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { gql, useMutation } from "urql";
 import { useRouter } from "next/router";
+import { withUrql } from "../lib/front/withUrql";
 
 const LoginQuery = gql`
   mutation Login($email: String!, $password: String!) {
@@ -24,7 +25,7 @@ const LoginQuery = gql`
   }
 `;
 
-export default function SignIn() {
+function SignIn() {
   const router = useRouter();
   const [result, mutate] = useMutation(LoginQuery);
 
@@ -32,12 +33,11 @@ export default function SignIn() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    await mutate({
+    const { data: d, error } = await mutate({
       email: data.get("email"),
       password: data.get("password"),
     });
-    const { data: d, fetching, error } = result;
-    if (fetching) return <p>Loading...</p>;
+    if (result.fetching) return <p>Loading...</p>;
     if (error) return <p>Oh no... {error.message}</p>;
     if (d.login) {
       localStorage.setItem("token", d.login.token);
@@ -110,3 +110,5 @@ export default function SignIn() {
     </Container>
   );
 }
+
+export default withUrql()(SignIn);

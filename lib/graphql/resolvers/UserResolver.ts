@@ -19,11 +19,6 @@ import { Auth } from "../middlewares/Auth";
 
 @Resolver()
 export class UserResolver {
-  @Query(() => String)
-  hello() {
-    return "Hello World!";
-  }
-
   @UseMiddleware(Auth)
   @Query(() => User)
   async me(@Ctx() { userId, prisma }: Context) {
@@ -92,7 +87,7 @@ export class UserResolver {
     @Arg("email", () => String) email: string,
     @Arg("password", () => String) password: string,
     @Ctx() { prisma }: Context
-  ) {
+  ): Promise<Token> {
     const user = await prisma.user.findFirst({ where: { email } });
 
     if (!user) throw new GraphQLError("email", "Invalid Email");
@@ -111,7 +106,7 @@ export class UserResolver {
   async refresh(
     @Arg("token", () => String) refresh_token: string,
     @Ctx() { prisma }: Context
-  ) {
+  ): Promise<Token> {
     const { bot, id, v } = ve(
       refresh_token,
       process.env.JWT_REFRESH_TOKEN_SECRET!

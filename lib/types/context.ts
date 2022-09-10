@@ -1,10 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { MicroRequest } from "apollo-server-micro/dist/types";
-import { ServerResponse } from "http";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export interface Context {
   prisma: PrismaClient;
   userId?: string;
-  req: MicroRequest;
-  res: ServerResponse;
+  req: NextApiRequest;
+  res: NextApiResponse;
 }

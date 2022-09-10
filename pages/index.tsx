@@ -1,19 +1,25 @@
 import { gql, useQuery } from "urql";
+import { withUrql } from "../lib/front/withUrql";
 
-const HelloQuery = gql`
+const MeQuery = gql`
   query {
-    hello
+    me {
+      id
+      username
+    }
   }
 `;
 
-export default function Home() {
+function Home() {
   const [result] = useQuery({
-    query: HelloQuery,
+    query: MeQuery,
   });
 
   const { data, fetching, error } = result;
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
 
-  return <div>{data.hello}</div>;
+  return <div>{JSON.stringify(data.me, null, 4)}</div>;
 }
+
+export default withUrql()(Home);
